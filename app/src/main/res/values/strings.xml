@@ -2,7 +2,7 @@
     <string name="app_name">Ogesture</string>
 
     <string name="accessibility_service_label">Ogesture</string>
-    <string name="accessibility_service_description">Performs Back, Home, and Recents when an edge zone is swiped.</string>
+    <string name="accessibility_service_description">Performs Back, Home, Recents, and last-app switching when edge zones are swiped.</string>
 
     <string name="setup_title">Setup</string>
     <string name="permission_accessibility">Accessibility service</string>
@@ -21,9 +21,9 @@
 
     <string name="a11y_consent_title">Before you turn on Accessibility</string>
     <string name="a11y_consent_why_label">Why Ogesture needs it</string>
-    <string name="a11y_consent_why_body">Android only lets an accessibility service perform Back, Home, and Recents. Ogesture uses it for nothing else — it runs one of those actions when you swipe in from a screen edge.</string>
+    <string name="a11y_consent_why_body">Android only lets an accessibility service perform Back, Home, and Recents. Ogesture uses it for nothing else — it runs one of those actions when you swipe from an edge.</string>
     <string name="a11y_consent_data_label">Your data is safe</string>
-    <string name="a11y_consent_data_body">Nothing is collected, stored off your phone, or shared with anyone. Ogesture has no internet permission, no ads, and no analytics. Your settings stay on this device and are deleted when you uninstall the app.</string>
+    <string name="a11y_consent_data_body">Nothing is collected, stored off your phone, or shared with anyone. Ogesture has no internet permission, no ads, and no analytics. Your settings stay on this phone and are deleted when you uninstall the app.</string>
     <string name="a11y_consent_control_label">You stay in control</string>
     <string name="a11y_consent_control_body">You can turn the service off at any time in Settings › Accessibility › Ogesture.</string>
     <string name="a11y_consent_privacy_policy">Read the full privacy policy</string>
@@ -44,8 +44,8 @@
     <string name="reliability_battery_on">Granted — the system won\'t sleep the gesture service.</string>
     <string name="reliability_battery_off">Required — the system can otherwise kill the gesture service.</string>
     <string name="reliability_battery_action">Allow</string>
-    <string name="reliability_samsung_note">Also open Settings › Battery › Background usage limits and make sure Ogesture is not in the \"Sleeping apps\" or \"Deep sleeping apps\" list.</string>
-    <string name="reliability_autostart_note">Also enable the \"Autostart\" permission for Ogesture in your phone\'s settings (on Xiaomi: Security app › Permissions › Autostart). Without it, the gesture service can be killed in the background.</string>
+    <string name="reliability_samsung_note">Also open Settings › Battery › Background usage limits and make sure Ogesture is not in the "Sleeping apps" or "Deep sleeping apps" list.</string>
+    <string name="reliability_autostart_note">Also enable the "Autostart" permission for Ogesture in your phone\'s settings (on Xiaomi: Security app › Permissions › Autostart). Without it, the service may be killed after a reboot.</string>
 
     <string name="gestures_title">Gestures supported</string>
     <string name="gesture_home_label">Home</string>
@@ -54,11 +54,13 @@
     <string name="gesture_recents_desc">Swipe up from the bottom edge and hold.</string>
     <string name="gesture_back_label">Back</string>
     <string name="gesture_back_desc">Swipe inward from the left or right edge.</string>
+    <string name="gesture_last_app_label">Last app</string>
+    <string name="gesture_last_app_desc">Swipe inward from the left or right edge and hold.</string>
 
     <string name="compat_title">App compatibility</string>
     <string name="compat_screen_title">App compatibility</string>
     <string name="compat_entry_desc">Turn Ogesture off inside apps that ignore gesture taps.</string>
-    <string name="compat_intro">A few apps may ignore the touches on gesture areas for security or other reasons. In those apps a tap near a screen edge may not work. Swipes for Back, Home, and Recents still work fine.\n\nIf dead taps bother you in an app, add it here — Ogesture will stay off inside that app.</string>
+    <string name="compat_intro">A few apps may ignore the touches on gesture areas for security or other reasons. In those apps a tap near a screen edge may not work. Swipes for Back, Home, and Recents still work everywhere else.</string>
     <string name="compat_apps_header">Gestures turned off for</string>
     <string name="compat_empty">No apps added yet — gestures are on everywhere.</string>
     <string name="compat_add_app">Add app</string>

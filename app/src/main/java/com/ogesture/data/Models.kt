@@ -1,6 +1,6 @@
 package com.ogesture.data
 
-enum class GestureAction { BACK, HOME, RECENTS }
+enum class GestureAction { BACK, HOME, RECENTS, LAST_APP }
 
 enum class ZoneId { BOTTOM, LEFT_EDGE, RIGHT_EDGE }
 
@@ -22,10 +22,10 @@ data class ZoneConfig(
 
 /**
  * The fixed gesture layout: swipe up from the bottom for Home (hold for Recents),
- * swipe in from either side edge for Back.
+ * swipe in from either side edge for Back (hold to switch to the previous app).
  */
 val GESTURE_ZONES = listOf(
     ZoneConfig(ZoneId.BOTTOM, GestureAction.HOME, longAction = GestureAction.RECENTS, lengthPercent = 80, thicknessDp = 12),
-    ZoneConfig(ZoneId.LEFT_EDGE, GestureAction.BACK, longAction = null, lengthPercent = 80, thicknessDp = 16),
-    ZoneConfig(ZoneId.RIGHT_EDGE, GestureAction.BACK, longAction = null, lengthPercent = 80, thicknessDp = 16),
+    ZoneConfig(ZoneId.LEFT_EDGE, GestureAction.BACK, longAction = GestureAction.LAST_APP, lengthPercent = 80, thicknessDp = 16),
+    ZoneConfig(ZoneId.RIGHT_EDGE, GestureAction.BACK, longAction = GestureAction.LAST_APP, lengthPercent = 80, thicknessDp = 16),
 )

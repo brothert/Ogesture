@@ -30,6 +30,10 @@ class EdgeGestureAccessibilityService : AccessibilityService(), GestureDispatche
     private val handler = Handler(Looper.getMainLooper())
     private val repo by lazy { SettingsRepository.get(this) }
 
+    // Most-recent-first, distinct launchable app packages. Kept in memory only; we need the
+    // last two to implement the previous-app gesture and do not persist app activity.
+    private val recentApps = ArrayDeque<String>(2)
+
     // Owns the gesture-zone and indicator windows. Created when the service binds and
     // destroyed when it unbinds, so the windows follow the accessibility-service lifecycle
     // exactly: Android rebinds the service after process death and the controller comes
@@ -65,6 +69,36 @@ class EdgeGestureAccessibilityService : AccessibilityService(), GestureDispatche
         }
     }
 
+    /** Add a new foreground launchable app; repeat events don't perturb the two-app order. */
+    private fun rememberRecentApp(pkg: String) {
+        if (pkg == packageName || pkg in imePackages) return
+        // The narrow launcher-intent visibility in the manifest lets us identify apps that
+        // can actually be reopened, while filtering system surfaces and transient windows.
+        if (packageManager.getLaunchIntentForPackage(pkg) == null) return
+        if (recentApps.firstOrNull() == pkg) return
+        recentApps.remove(pkg)
+        recentApps.addFirst(pkg)
+        while (recentApps.size > MAX_RECENT_APPS) recentApps.removeLast()
+    }
+
+    private fun switchToPreviousApp() {
+        val targetPkg = recentApps.getOrNull(1) ?: return
+        val intent = packageManager.getLaunchIntentForPackage(targetPkg) ?: run {
+            // The app may have been uninstalled or become unavailable since it was recorded.
+            recentApps.remove(targetPkg)
+            return
+        }
+        // NEW_TASK brings the existing app task forward when present; don't CLEAR_TOP, which
+        // could discard the user's current screen within that app.
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not open previous app package $targetPkg", e)
+            recentApps.remove(targetPkg)
+        }
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
@@ -94,6 +128,7 @@ class EdgeGestureAccessibilityService : AccessibilityService(), GestureDispatche
         handler.removeCallbacks(watchdog)
         controller?.stop()
         controller = null
+        recentApps.clear()
         return super.onUnbind(intent)
     }
 
@@ -102,6 +137,7 @@ class EdgeGestureAccessibilityService : AccessibilityService(), GestureDispatche
         handler.removeCallbacks(watchdog)
         controller?.stop()
         controller = null
+        recentApps.clear()
         scope.cancel()
         super.onDestroy()
     }
@@ -133,11 +169,12 @@ class EdgeGestureAccessibilityService : AccessibilityService(), GestureDispatche
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        // Only the foreground package name is read — never window content. It drives the
-        // per-app pass-through: zones go untouchable while an excluded app is in front.
+        // Only foreground package names are read — never window content. They drive per-app
+        // pass-through and a two-entry, in-memory history for the previous-app gesture.
         if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
         if (pkg == packageName || pkg in imePackages) return
+        rememberRecentApp(pkg)
         foregroundPackage.value = pkg
     }
 
@@ -148,6 +185,7 @@ class EdgeGestureAccessibilityService : AccessibilityService(), GestureDispatche
             GestureAction.BACK -> performGlobalAction(GLOBAL_ACTION_BACK)
             GestureAction.HOME -> performGlobalAction(GLOBAL_ACTION_HOME)
             GestureAction.RECENTS -> performGlobalAction(GLOBAL_ACTION_RECENTS)
+            GestureAction.LAST_APP -> switchToPreviousApp()
         }
     }
 
@@ -169,6 +207,7 @@ class EdgeGestureAccessibilityService : AccessibilityService(), GestureDispatche
     companion object {
         private const val TAG = "EdgeGestureA11y"
         private const val WATCHDOG_INTERVAL_MS = 10_000L
+        private const val MAX_RECENT_APPS = 2
 
         @Volatile
         var instance: EdgeGestureAccessibilityService? = null
